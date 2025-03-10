@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
-	"medhaapb/wg-connect/next"
+	"medhaapb/wg-connect/channels"
+	"sync"
+	"time"
 )
 
 func length(data []int) int {
@@ -13,24 +15,39 @@ func length(data []int) int {
 	}
 	return c
 }
+func calcres(index int, value int, res []int, operation func(int) int, wg *sync.WaitGroup) {
+	fmt.Println(&wg)
+	defer wg.Done()
+	res[index] = operation(value)
+}
+
 func mapper(data []int, operation func(int) int) []int {
 
 	res := make([]int, length(data))
-	for i := range data {
-		res[i] = operation(data[i])
+	var wg sync.WaitGroup
+	for index, value := range data {
+		wg.Add(1)
+		fmt.Println(&wg)
+		go calcres(index, value, res, operation, &wg)
+
 	}
+	wg.Wait()
 	return res
 
 }
 
 func square(ele int) int {
+	time.Sleep(1 * time.Second)
+
 	return ele * ele
 }
 
 func main() {
-	//result := mapper([]int{1, 2, 3, 4, 5, 6}, square)
-	//fmt.Println(result)
-	//fmt.Println(next.Giveprotocol("https://www.google.com/search?client=ubuntu-sn&hs=Fcn&sca_esv=b597786ab811f977&channel=fs&sxsrf=AHTn8zr3PqJ8aGba7fODIpSs98RTC5KPmg:1741238135135&q=small++coding+exercise+questions+on+%22http%22&sa=X&ved=2ahUKEwiGmo7E2fSLAxUIlq8BHRrHEPEQ5t4CegQIJBAB&biw=1408&bih=703&dpr=1.36"))
-	fmt.Println(next.Givedomain("https://www.google.com:0303/search?client=ubuntu-sn&hs=Fcn&sca_esv=b597786ab811f977&channel=fs&sxsrf=AHTn8zr3PqJ8aGba7fODIpSs98RTC5KPmg:1741238135135&q=small++coding+exercise+questions+on+%22http%22&sa=X&ved=2ahUKEwiGmo7E2fSLAxUIlq8BHRrHEPEQ5t4CegQIJBAB&biw=1408&bih=703&dpr=1.36"))
+	tm1 := time.Now()
+	result := mapper([]int{1, 2, 3, 4, 5, 6}, square)
+	fmt.Println(result)
+	tm2 := time.Now()
+	fmt.Println(tm1, tm2)
+	fmt.Println(channels.Mapping([]int{1, 2, 3, 4, 5}, square))
 
 }
