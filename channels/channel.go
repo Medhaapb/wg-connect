@@ -21,7 +21,7 @@ func Mapping(data []int, operation func(int) int) []int {
 
 	resChannel := make(chan struct{ index, value int }, len(data))
 
-	for index, value := range data { //value -value from the data[]
+	for index, value := range data {
 		go calcres(index, value, resChannel, operation)
 	}
 
