@@ -10,7 +10,6 @@ func Giveprotocol(url string) string {
 		return url
 	}
 	return url[:index]
-
 }
 
 func Givedomain(url string) string {
