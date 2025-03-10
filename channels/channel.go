@@ -3,7 +3,6 @@ package channels
 import (
 	"time"
 )
-
 func length(data []int) int {
 	c := 0
 	for range data {
