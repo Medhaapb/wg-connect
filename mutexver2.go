@@ -3,8 +3,8 @@ package mutex
 import (
 	"fmt"
 	"sync"
+	"runtime"
 	"sync/atomic"
-	"time"
 )
 //finds the length of the input slice
 func length(data []int) int {
@@ -29,19 +29,15 @@ func Mapping(data []int, operation func(int) int) []int {
 	for index, value := range data {//iterate through each value
 		go calcres(index, value, res, &mu, operation, &done)//call a new goroutine foe each value in the slice
 	}
-	startTime := time.Now()//gives the current time.used to check if the operation has exceeded the timeout
-	timeoutDuration := 5 * time.Second //specifies the duaration within which all the goroutines should complete
-	for {
-		if atomic.LoadInt32(&done) == int32(length(data)) {//LoadInt32-loads the value of done.checks if value of done is equal to the length of the input slice
-			return res
-		}
-		if time.Since(startTime) > timeoutDuration {//comes out of for loop if timeinterval is greater than timeoutduration
-			break
-		}
-	}
-	return nil//return nil if task is not completed within the timeoutduration
+	
+	runtime.Goshed()//yield the processor
+	return res
 }
 func square(ele int) int {
 	time.Sleep(1 * time.Second)//pauses for 1second
 	return ele * ele//returns square of the element
+}
+func main() {
+	result := Mapping([]int{1, 2, 3, 4, 5}, square)
+	fmt.Println("Result:", result)
 }
