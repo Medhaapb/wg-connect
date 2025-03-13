@@ -15,22 +15,30 @@ func length(data []int) int {
 	return c
 }
 //calculate the result
-func calcres(index, value int, res []int, mu *sync.Mutex, operation func(int) int, done *int32) {
-	result := operation(value)//performs the square operation and store the value in result
+func calcres(index int, value int, res []int, operation func(int) int, mu *sync.Mutex, counter *int) {
 	mu.Lock()//locks res slice to allow only on goroutine to write in one time
-	res[index] = result//store result in res slice in particular index 
+	res[index] = operation(value)//store result in res slice in particular index 
 	mu.Unlock()//unlocks res after writing
-	atomic.AddInt32(done, 1)//increments done by 1
+	*counter++
 }
 func Mapping(data []int, operation func(int) int) []int {
 	res := make([]int, length(data))//create a new slice with same size od input slice to store the result
-	var mu sync.Mutex//create an object for mutex
-	var done int32// to count number of goroutines that are completed
-	for index, value := range data {//iterate through each value
-		go calcres(index, value, res, &mu, operation, &done)//call a new goroutine foe each value in the slice
+	var mu sync.Mutex
+	var done sync.Mutex
+	var counter int
+	for index, value := range data {
+		go calcres(index, value, res, operation, &mu, &counter, &done)//call a new goroutine foe each value in the slice
 	}
 	
-	runtime.Goshed()//yield the processor
+	// Keep checking if all goroutines are done
+	for {
+		done.Lock()
+		if counter == len(data) {
+			done.Unlock()
+			break
+		}
+		done.Unlock()
+	}
 	return res
 }
 func square(ele int) int {
