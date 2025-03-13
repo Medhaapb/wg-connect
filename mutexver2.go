@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
-	"runtime"
-	"sync/atomic"
+	
 )
 //finds the length of the input slice
 func length(data []int) int {
