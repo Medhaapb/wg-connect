@@ -68,7 +68,7 @@ func startUDPServer(address string) {
 	if err != nil {
 		log.Fatalf("Failed to start UDP server: %v", err)
 	}
-	defer conn.Close()
+	
 
 	buffer := make([]byte, 1024)
 	for {
