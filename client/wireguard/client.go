@@ -84,7 +84,7 @@ func sendUDPMessage(address, message string) {
 	if err != nil {
 		log.Fatalf("Failed to send UDP message: %v", err)
 	}
-	defer conn.Close()
+
 
 	_, err = conn.Write([]byte(message))
 	if err != nil {
